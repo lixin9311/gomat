@@ -1,10 +1,10 @@
 package gomat
 
 import (
-//"errors"
+	"math/cmplx"
 )
 
-type Matrix [][]float64
+type Matrix [][]complex128
 
 func Empty(A Matrix) bool {
 	if len(A) == 0 || len(A[0]) == 0 {
@@ -68,7 +68,7 @@ func Pinv(A Matrix) Matrix {
 	return Mat_mult(T(A), Inv(Mat_mult(A, T(A))))
 }
 
-func Div(B Matrix, n float64) Matrix {
+func Div(B Matrix, n complex128) Matrix {
 	rows, cols := len(B), len(B[0])
 	C := Zeros(rows, cols)
 	for i := 0; i < rows; i++ {
@@ -84,7 +84,7 @@ func T(B Matrix) Matrix {
 	A := Zeros(cols, rows)
 	for i := 0; i < rows; i++ {
 		for j := 0; j < cols; j++ {
-			A[j][i] = B[i][j]
+			A[j][i] = cmplx.Conj(B[i][j])
 		}
 	}
 	return A
@@ -111,7 +111,7 @@ func Adj(B Matrix) Matrix {
 	return T(C)
 }
 
-func A(B Matrix, i, j int) float64 {
+func A(B Matrix, i, j int) complex128 {
 	A := copyMatrix(B)
 	//_ = Remove(A, i, j)
 	//fmt.Println("C[" , i , "][" , j , "]=" , Det(Remove(A, i, j) ))
@@ -137,17 +137,6 @@ func remove(A Matrix, i, j int) Matrix {
 	return slice
 }
 
-func MakeMatrix(n int) Matrix {
-	m := make(Matrix, n)
-	for i := 0; i < n; i++ {
-		m[i] = make([]float64, n)
-		for j := 0; j < n; j++ {
-			m[i][j] = float64(i*n + j + 1)
-		}
-	}
-	return m
-}
-
 func Mat_mult(A, B Matrix) (C Matrix) {
 	k := len(B)
 	if k != len(A[0]) {
@@ -164,9 +153,9 @@ func Mat_mult(A, B Matrix) (C Matrix) {
 func Zeros(x, y int) Matrix {
 	m := make(Matrix, x)
 	for i := 0; i < x; i++ {
-		m[i] = make([]float64, y)
+		m[i] = make([]complex128, y)
 		for j := 0; j < y; j++ {
-			m[i][j] = float64(0)
+			m[i][j] = complex128(0)
 		}
 	}
 	return m
@@ -214,7 +203,7 @@ func matmult(done chan<- struct{}, A, B, C Matrix, i0, i1, j0, j1, k0, k1, thres
 	}
 }
 
-func Det(B Matrix) float64 {
+func Det(B Matrix) complex128 {
 
 	n := len(B)
 
@@ -224,12 +213,12 @@ func Det(B Matrix) float64 {
 
 	A := copyMatrix(B)
 	//newcopy(A, B)
-	sign, ret, j := 0, 1.0, 0
+	sign, ret, j := 0, 1.0+0i, 0
 
 	for i := 0; i < n; i++ {
-		if A[i][i] == 0.0 {
+		if A[i][i] == 0 {
 			for j = i + 1; j < n; j++ {
-				if A[j][i] != 0.0 {
+				if A[j][i] != 0 {
 					break
 				}
 			}
