@@ -14,6 +14,43 @@ func Empty(A Matrix) bool {
 	}
 }
 
+func (m Matrix) Row() int {
+	return len(m)
+}
+
+func (m Matrix) ApplyFunc(f func(int, int, *complex128)) Matrix {
+	for i := 0; i < m.Row(); i++ {
+		for j := 0; j < m.Col(); j++ {
+			f(i, j, &m[i][j])
+		}
+	}
+	return m
+}
+
+func (m Matrix) AddComplex(n complex128) Matrix {
+	for i := 0; i < m.Row(); i++ {
+		for j := 0; j < m.Col(); j++ {
+			m[i][j] += n
+		}
+	}
+	return m
+}
+
+func (m Matrix) Col() int {
+	if m.Row() == 0 {
+		return 0
+	}
+	return len(m[0])
+}
+
+func (m Matrix) PickCol(n int) []complex128 {
+	result := make([]complex128, m.Row())
+	for i := 0; i < m.Row(); i++ {
+		result[i] = m[i][n]
+	}
+	return result
+}
+
 func Identity(A, B Matrix) bool {
 	rows_A, cols_A := len(A), len(A[0])
 	rows_B, cols_B := len(B), len(B[0])
